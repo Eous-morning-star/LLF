@@ -215,17 +215,23 @@ equipment_thresholds = ({
 # Define the file path at the top of the script
 file_path = "condition_data.csv"
 
-# Create the directory if it doesn't exist
-if not os.path.exists("data"):
-    os.makedirs("data")
-# Initialize session state variables
-if "page" not in st.session_state:
-    st.session_state.page = "main"  # Set default page to "main"
+# Ensure the file exists or create it with a default structure
+if not os.path.exists(file_path):
+    # Define a default structure
+    default_data = pd.DataFrame(columns=[
+        "Date", "Area", "Equipment", "Is Running", "Driving End Temp",
+        "Driven End Temp", "Oil Level", "Abnormal Sound", "Leakage",
+        "Observation", "RMS Velocity (mm/s)", "Peak Acceleration (g)",
+        "Displacement (µm)", "Gearbox Temp", "Gearbox Oil Level",
+        "Gearbox Leakage", "Gearbox Abnormal Sound", "Gearbox RMS Velocity (mm/s)",
+        "Gearbox Peak Acceleration (g)", "Gearbox Displacement (µm)"
+    ])
+    default_data.to_csv(file_path, index=False)
 
+# Load data from the file
 def load_data(file_path):
-    """Load data from a CSV file."""
     if not os.path.exists(file_path):
-        return pd.DataFrame()  # Return an empty DataFrame if file doesn't exist
+        return pd.DataFrame()  # Return an empty DataFrame if the file is missing
     return pd.read_csv(file_path)
 
 # Add Utility Functions Here
