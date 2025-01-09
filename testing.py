@@ -4,6 +4,18 @@ import os
 from datetime import datetime, timedelta
 import plotly.express as px
 
+# Set the page configuration (must be the first Streamlit command)
+st.set_page_config(page_title="My App", layout="wide")
+
+file_path = "condition_data.csv"
+
+if not os.path.exists(file_path):
+    st.warning("No data file found. Please upload a valid data file.")
+    data = pd.DataFrame()  # Create an empty DataFrame
+else:
+    data = pd.read_csv(file_path)
+    st.success("Data file loaded successfully!")
+
 # Define deviation thresholds for specific equipment
 equipment_thresholds = ({
     # Reaction Area
