@@ -260,7 +260,6 @@ def calculate_kpis(file_path):
         "data": data
     }
 
-
 # Set page title
 st.set_page_config(page_title="Indorama Petrochemicals Ltd", layout="wide")
 
@@ -310,6 +309,23 @@ if st.session_state.page == "main":
     col2.metric("Average Temperature", kpis["avg_temp"])
     col3.metric("Running Equipment", kpis["running_percentage"])
 
+    # Function to check for deviations
+    def check_deviations(data, equipment_thresholds):
+        """
+        Identify equipment with deviations exceeding thresholds.
+        """
+        deviations = []
+        for _, row in data.iterrows():
+            equipment = row["Equipment"]
+            if equipment in equipment_thresholds:
+                thresholds = equipment_thresholds[equipment]
+                if (
+                        row["Driving End Temp"] > thresholds["Driving End Temp"] or
+                        row["Driven End Temp"] > thresholds["Driven End Temp"] or
+                        row["RMS Velocity (mm/s)"] > thresholds["RMS Velocity (mm/s)"]
+                ):
+                    deviations.append(row)
+        return pd.DataFrame(deviations)
 
     # Function to detect weekly deviations and generate a report
     def detect_weekly_deviations(file_path, equipment_thresholds, start_date, end_date):
