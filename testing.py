@@ -4,9 +4,6 @@ import os
 from datetime import datetime, timedelta
 import plotly.express as px
 
-# Set the page configuration (must be the first Streamlit command)
-st.set_page_config(page_title="My App", layout="wide")
-
 file_path = "condition_data.csv"
 
 if not os.path.exists(file_path):
