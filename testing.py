@@ -4,15 +4,6 @@ import os
 from datetime import datetime, timedelta
 import plotly.express as px
 
-file_path = "condition_data.csv"
-
-if not os.path.exists(file_path):
-    st.warning("No data file found. Please upload a valid data file.")
-    data = pd.DataFrame()  # Create an empty DataFrame
-else:
-    data = pd.read_csv(file_path)
-    st.success("Data file loaded successfully!")
-
 # Define deviation thresholds for specific equipment
 equipment_thresholds = ({
     # Reaction Area
@@ -226,15 +217,12 @@ equipment_thresholds = ({
 if "page" not in st.session_state:
     st.session_state.page = "main"  # Set default page to "main"
 
-# Load data from the file path
-file_path = "C:/Users/USER/Desktop/condition_data.csv"
 
-if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-    data = pd.read_csv(file_path)
-    data["Date"] = pd.to_datetime(data["Date"])  # Ensure the Date column is in datetime format
-else:
-    st.warning("No data file found or the file is empty.")
-    data = pd.DataFrame()  # Set an empty DataFrame if no data is available
+def load_data(file_path):
+    """Load data from a CSV file."""
+    if not os.path.exists(file_path):
+        return pd.DataFrame()  # Return an empty DataFrame if file doesn't exist
+    return pd.read_csv(file_path)
 
 # Add Utility Functions Here
 def calculate_kpis(file_path):
@@ -540,7 +528,6 @@ elif st.session_state.page == "monitoring":
             ]
         return filtered_df
 
-
     # Tabs for Condition Monitoring and Report
     tab1, tab2 = st.tabs(["Condition Monitoring", "Report"])
 
@@ -719,7 +706,7 @@ elif st.session_state.page == "monitoring":
     # Tab 2: Reports and Visualizations
     with (tab2):
         st.header("Reports and Visualization")
-        file_path = "data/condition_data.csv"
+        file_path = "C:/Users/USER/Desktop/condition_data.csv"
 
         # Load data
         data = load_data(file_path)
@@ -881,7 +868,6 @@ elif st.session_state.page == "monitoring":
                             st.plotly_chart(fig)
                         else:
                             st.warning("Gearbox Oil Level data is missing in the selected dataset.")
-
 
     # Add Back Button
     if st.button("Back to Home"):
