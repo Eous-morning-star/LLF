@@ -212,11 +212,15 @@ equipment_thresholds = ({
     "2-P-2303-A": {"Driving End Temp": 58, "Driven End Temp": 58, "RMS Velocity (mm/s)": 4.3},
     "2-P-2303-B": {"Driving End Temp": 58, "Driven End Temp": 58, "RMS Velocity (mm/s)": 4.3},
 })
+# Define the file path at the top of the script
+file_path = "data/condition_data.csv"
 
+# Create the directory if it doesn't exist
+if not os.path.exists("data"):
+    os.makedirs("data")
 # Initialize session state variables
 if "page" not in st.session_state:
     st.session_state.page = "main"  # Set default page to "main"
-
 
 def load_data(file_path):
     """Load data from a CSV file."""
@@ -268,9 +272,7 @@ if "page" not in st.session_state:
     st.session_state.page = "main"
 
 if st.session_state.page == "main":
-    # Set the file path for the database
-    file_path = "C:/Users/USER/Desktop/condition_data.csv"
-
+        #Main Page
     st.title("INDORAMA PETROCHEMICALS LTD")
     st.subheader("Your Gateway to Enhanced Maintenance Efficiency")
 
@@ -604,7 +606,6 @@ elif st.session_state.page == "monitoring":
             ]
         }
 
-
         # Persistent fields
         date = st.date_input("Date", key="date")
         area = st.selectbox("Select Area", options=list(equipment_lists.keys()), key="area")
@@ -657,72 +658,84 @@ elif st.session_state.page == "monitoring":
 
         # Submit Button
         if st.button("Submit Data"):
-            # Prepare data
-            if not is_running:
-                # If equipment is not running, set all numeric fields to 0 and strings to 'N/A'
-                data = {
-                    "Date": [date],
-                    "Area": [area],
-                    "Equipment": [equipment],
-                    "Is Running": [False],
-                    "Driving End Temp": [0.0],
-                    "Driven End Temp": [0.0],
-                    "Oil Level": ["N/A"],
-                    "Abnormal Sound": ["N/A"],
-                    "Leakage": ["N/A"],
-                    "Observation": ["Not Running"],
-                    "RMS Velocity (mm/s)": [0.0],
-                    "Peak Acceleration (g)": [0.0],
-                    "Displacement (µm)": [0.0],
-                    "Gearbox Temp": [0.0],
-                    "Gearbox Oil Level": ["N/A"],
-                    "Gearbox Leakage": ["N/A"],
-                    "Gearbox Abnormal Sound": ["N/A"],
-                    "Gearbox RMS Velocity (mm/s)": [0.0],
-                    "Gearbox Peak Acceleration (g)": [0.0],
-                    "Gearbox Displacement (µm)": [0.0],
-                }
-            else:
-                # If equipment is running, save entered values
-                data = {
-                    "Date": [date],
-                    "Area": [area],
-                    "Equipment": [equipment],
-                    "Is Running": [True],
-                    "Driving End Temp": [st.session_state.de_temp],
-                    "Driven End Temp": [st.session_state.dr_temp],
-                    "Oil Level": [st.session_state.oil_level],
-                    "Abnormal Sound": [st.session_state.abnormal_sound],
-                    "Leakage": [st.session_state.leakage],
-                    "Observation": [st.session_state.observation],
-                    "RMS Velocity (mm/s)": [st.session_state.vibration_rms_velocity],
-                    "Peak Acceleration (g)": [st.session_state.vibration_peak_acceleration],
-                    "Displacement (µm)": [st.session_state.vibration_displacement],
-                    "Gearbox Temp": [st.session_state.gearbox_temp if "gearbox_temp" in st.session_state else 0.0],
-                    "Gearbox Oil Level": [st.session_state.gearbox_oil if "gearbox_oil" in st.session_state else "N/A"],
-                    "Gearbox Leakage": [
-                        st.session_state.gearbox_leakage if "gearbox_leakage" in st.session_state else "N/A"],
-                    "Gearbox Abnormal Sound": [
-                        st.session_state.gearbox_leakage if "gearbox_abnormal_sound" in st.session_state else "N/A"]
-                }
+            try:
+                # Check if essential fields are filled (add your required fields here)
+                if not date or not area or not equipment:
+                    st.error("Please fill in all required fields before submitting.")
+                elif is_running and ("de_temp" not in st.session_state or "dr_temp" not in st.session_state):
+                    st.error("Please provide temperature values if the equipment is running.")
+                else:
+                    # Prepare data
+                    if not is_running:
+                        # If equipment is not running, set all numeric fields to 0 and strings to 'N/A'
+                        data = {
+                            "Date": [date],
+                            "Area": [area],
+                            "Equipment": [equipment],
+                            "Is Running": [False],
+                            "Driving End Temp": [0.0],
+                            "Driven End Temp": [0.0],
+                            "Oil Level": ["N/A"],
+                            "Abnormal Sound": ["N/A"],
+                            "Leakage": ["N/A"],
+                            "Observation": ["Not Running"],
+                            "RMS Velocity (mm/s)": [0.0],
+                            "Peak Acceleration (g)": [0.0],
+                            "Displacement (µm)": [0.0],
+                            "Gearbox Temp": [0.0],
+                            "Gearbox Oil Level": ["N/A"],
+                            "Gearbox Leakage": ["N/A"],
+                            "Gearbox Abnormal Sound": ["N/A"],
+                            "Gearbox RMS Velocity (mm/s)": [0.0],
+                            "Gearbox Peak Acceleration (g)": [0.0],
+                            "Gearbox Displacement (µm)": [0.0],
+                        }
 
-            # Save to CSV
-            df = pd.DataFrame(data)
-            file_path = "C:/Users/USER/Desktop/condition_data.csv"
-            if not os.path.exists("data"):
-                os.makedirs("data")
-            if os.path.exists(file_path):
-                df.to_csv(file_path, mode="a", header=False, index=False)
-            else:
-                df.to_csv(file_path, index=False)
+                    else:
+                        # If equipment is running, save entered values
+                        data = {
+                            "Date": [date],
+                            "Area": [area],
+                            "Equipment": [equipment],
+                            "Is Running": [True],
+                            "Driving End Temp": [st.session_state.de_temp],
+                            "Driven End Temp": [st.session_state.dr_temp],
+                            "Oil Level": [st.session_state.oil_level],
+                            "Abnormal Sound": [st.session_state.abnormal_sound],
+                            "Leakage": [st.session_state.leakage],
+                            "Observation": [st.session_state.observation],
+                            "RMS Velocity (mm/s)": [st.session_state.vibration_rms_velocity],
+                            "Peak Acceleration (g)": [st.session_state.vibration_peak_acceleration],
+                            "Displacement (µm)": [st.session_state.vibration_displacement],
+                            "Gearbox Temp": [
+                                st.session_state.gearbox_temp if "gearbox_temp" in st.session_state else 0.0],
+                            "Gearbox Oil Level": [
+                                st.session_state.gearbox_oil if "gearbox_oil" in st.session_state else "N/A"],
+                            "Gearbox Leakage": [
+                                st.session_state.gearbox_leakage if "gearbox_leakage" in st.session_state else "N/A"],
+                            "Gearbox Abnormal Sound": [
+                                st.session_state.gearbox_leakage if "gearbox_abnormal_sound" in st.session_state else "N/A"]
+                        }
 
-            st.success("Data Submitted Successfully!")
+                    # Save to CSV
+                    df = pd.DataFrame(data)
+                    file_path = "data/condition_data.csv"
+                    if not os.path.exists("data"):
+                        os.makedirs("data")
+                    if os.path.exists(file_path):
+                        df.to_csv(file_path, mode="a", header=False, index=False)
+                    else:
+                        df.to_csv(file_path, index=False)
 
+                    st.success("Data Submitted Successfully!")
+
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
 
     # Tab 2: Reports and Visualizations
-    with (tab2):
+    with tab2:
         st.header("Reports and Visualization")
-        file_path = "C:/Users/USER/Desktop/condition_data.csv"
+        file_path = "data/condition_data.csv"
 
         # Load data
         data = load_data(file_path)
@@ -733,17 +746,15 @@ elif st.session_state.page == "monitoring":
             st.write("### Full Data")
             st.dataframe(data)
 
-            # Debugging Step: Show columns
-            st.write("### Column Names")
-            st.write(list(data.columns))
-
             # Check if 'Equipment' column exists
             if "Equipment" not in data.columns:
                 st.error("The 'Equipment' column is missing. Please check the data file.")
             else:
+                # Combine all equipment into a single list
+                all_equipment = [equipment for area in equipment_lists.values() for equipment in area]
+
                 # Dropdown for Equipment Selection
-                equipment_options = data["Equipment"].unique()
-                selected_equipment = st.selectbox("Select Equipment", options=equipment_options)
+                selected_equipment = st.selectbox("Select Equipment", options=all_equipment)
 
                 # Date Range Inputs
                 start_date = st.date_input("Start Date", value=datetime(2023, 1, 1))
@@ -752,11 +763,20 @@ elif st.session_state.page == "monitoring":
                 if start_date > end_date:
                     st.error("Start date cannot be later than end date.")
                 else:
-                    # Filter Data
-                    filtered_data = filter_data(data, selected_equipment, start_date, end_date)
+                    # Filter data for the selected equipment and date range
+                    data["Date"] = pd.to_datetime(data["Date"], errors="coerce")
+                    data = data.dropna(subset=["Date"])  # Remove invalid dates
+                    filtered_data = data[
+                        (data["Equipment"] == selected_equipment) &
+                        (data["Date"] >= pd.to_datetime(start_date)) &
+                        (data["Date"] <= pd.to_datetime(end_date))
+                        ]
 
+                    # Check if filtered data is empty
                     if filtered_data.empty:
                         st.warning(f"No data found for {selected_equipment} between {start_date} and {end_date}.")
+                        st.write(f"### {selected_equipment} Report")
+                        st.write("The equipment hasn't been running during the selected date range.")
                     else:
                         st.write(f"### Filtered Data for {selected_equipment}")
                         st.dataframe(filtered_data)
@@ -872,19 +892,28 @@ elif st.session_state.page == "monitoring":
                         # Oil Level Distribution for Gearbox
                         if "Gearbox Oil Level" in visualization_data.columns:
                             st.write("#### Oil Level Distribution for Gearbox")
-                            gearbox_oil_summary = visualization_data["Gearbox Oil Level"].value_counts().reset_index()
-                            gearbox_oil_summary.columns = ["Gearbox Oil Level", "Count"]
-                            fig = px.bar(
-                                gearbox_oil_summary,
-                                x="Gearbox Oil Level",
-                                y="Count",
-                                title="Oil Level Distribution for Gearbox",
-                                labels={"Count": "Number of Records"}
-                            )
-                            st.plotly_chart(fig)
+
+                            # Check for missing or null values
+                            if visualization_data["Gearbox Oil Level"].notna().any():
+                                # Create a summary of Gearbox Oil Level distribution
+                                gearbox_oil_summary = visualization_data[
+                                    "Gearbox Oil Level"].value_counts().reset_index()
+                                gearbox_oil_summary.columns = ["Gearbox Oil Level", "Count"]
+
+                                # Create the bar chart
+                                fig = px.bar(
+                                    gearbox_oil_summary,
+                                    x="Gearbox Oil Level",
+                                    y="Count",
+                                    title="Oil Level Distribution for Gearbox",
+                                    labels={"Count": "Number of Records"}
+                                )
+                                st.plotly_chart(fig)
+                            else:
+                                st.warning("No valid Gearbox Oil Level data available in the selected dataset.")
                         else:
                             st.warning("Gearbox Oil Level data is missing in the selected dataset.")
 
-    # Add Back Button
-    if st.button("Back to Home"):
-        st.session_state.page = "main"
+# Add Back Button
+if st.button("Back to Home"):
+    st.session_state.page = "main"
